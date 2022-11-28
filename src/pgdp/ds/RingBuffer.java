@@ -24,7 +24,7 @@ public class RingBuffer {
 		return stored == mem.length;
 	}
 
-	public void put(int val) {
+	public void put(int val) throws InterruptedException {
 		if (isFull()) {
 			return;
 		}
@@ -33,7 +33,7 @@ public class RingBuffer {
 		stored++;
 	}
 
-	public int get() {
+	public int get() throws InterruptedException {
 		if (isEmpty()) {
 			return Integer.MIN_VALUE;
 		}
