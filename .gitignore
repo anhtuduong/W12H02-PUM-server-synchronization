@@ -9,6 +9,7 @@ build
 *.jar
 *.war
 *.ear
+/test
 
 #################
 # Eclipse .gitignore

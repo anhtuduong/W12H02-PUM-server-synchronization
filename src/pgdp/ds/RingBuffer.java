@@ -9,7 +9,7 @@ public class RingBuffer {
 	private int out;
 	private int stored;
 
-	RingBuffer(int capacity) {
+	public RingBuffer(int capacity) {
 		mem = new int[capacity];
 		in = 0;
 		out = 0;
@@ -24,14 +24,13 @@ public class RingBuffer {
 		return stored == mem.length;
 	}
 
-	public boolean put(int val) {
+	public void put(int val) {
 		if (isFull()) {
-			return false;
+			return;
 		}
 		mem[in++] = val;
 		in %= mem.length;
 		stored++;
-		return true;
 	}
 
 	public int get() {
