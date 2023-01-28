@@ -1,6 +1,7 @@
 package pgdp.ds;
 
 import java.util.Arrays;
+import java.util.concurrent.Semaphore;
 
 public class RingBuffer {
 
@@ -8,12 +9,14 @@ public class RingBuffer {
 	private int in;
 	private int out;
 	private int stored;
+	private Semaphore semaphore;
 
 	public RingBuffer(int capacity) {
 		mem = new int[capacity];
 		in = 0;
 		out = 0;
 		stored = 0;
+		semaphore = new Semaphore(capacity);
 	}
 
 	public boolean isEmpty() {
@@ -25,22 +28,29 @@ public class RingBuffer {
 	}
 
 	public void put(int val) throws InterruptedException {
-		if (isFull()) {
-			return;
+		semaphore.acquire();
+		try {
+			mem[in++] = val;
+			in %= mem.length;
+			stored++;
+		} finally {
+			semaphore.release();
 		}
-		mem[in++] = val;
-		in %= mem.length;
-		stored++;
 	}
 
 	public int get() throws InterruptedException {
-		if (isEmpty()) {
-			return Integer.MIN_VALUE;
+		semaphore.acquire();
+		try {
+			if (isEmpty()) {
+				return Integer.MIN_VALUE;
+			}
+			int val = mem[out++];
+			out %= mem.length;
+			stored--;
+			return val;
+		} finally {
+			semaphore.release();
 		}
-		int val = mem[out++];
-		out %= mem.length;
-		stored--;
-		return val;
 	}
 
 	@Override

@@ -1,47 +1,80 @@
 package pgdp.ds;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 public class MultiStack {
 
 	private final Stack stacks;
+	private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
 	public MultiStack() {
 		stacks = new Stack(1);
 	}
 
 	public void push(int val) {
-		stacks.push(val);
+		lock.writeLock().lock();
+		try {
+			stacks.push(val);
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 
 	public int pop() {
-		if (stacks.isEmpty()) {
-			return Integer.MIN_VALUE;
+		lock.writeLock().lock();
+		try {
+			if (stacks.isEmpty()) {
+				return Integer.MIN_VALUE;
+			}
+			return stacks.pop();
+		} finally {
+			lock.writeLock().unlock();
 		}
-		return stacks.pop();
 	}
 
 	public int top() {
-		if (stacks.isEmpty()) {
-			return Integer.MIN_VALUE;
+		lock.readLock().lock();
+		try {
+			if (stacks.isEmpty()) {
+				return Integer.MIN_VALUE;
+			}
+			return stacks.top();
+		} finally {
+			lock.readLock().unlock();
 		}
-		return stacks.top();
 	}
 
 	public int size() {
-		if (stacks.isEmpty()) {
-			return 0;
+		lock.readLock().lock();
+		try {
+			if (stacks.isEmpty()) {
+				return 0;
+			}
+			return stacks.size();
+		} finally {
+			lock.readLock().unlock();
 		}
-		return stacks.size();
 	}
 
 	public int search(int element) {
-		if (stacks.isEmpty()) {
-			return -1;
+		lock.readLock().lock();
+		try {
+			if (stacks.isEmpty()) {
+				return -1;
+			}
+			return stacks.search(element);
+		} finally {
+			lock.readLock().unlock();
 		}
-		return stacks.search(element);
 	}
 
 	@Override
 	public String toString() {
-		return stacks.toString();
+		lock.readLock().lock();
+		try {
+			return stacks.toString();
+		} finally {
+			lock.readLock().unlock();
+		}
 	}
 }
